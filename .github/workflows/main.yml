@@ -1,0 +1,61 @@
+name: Full CI/CD Demo
+
+on:
+  push:
+    branches: [ main ]
+
+# Jep leje për push (shumë e rëndësishme!)
+permissions:
+  contents: write
+
+jobs:
+  full-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️. Source - merr kodin nga repo
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2️. Build
+      - name: Build
+        run: echo "Building the application..."
+
+      # 3️. Test
+      - name: Run Tests
+        run: echo "Running tests..."
+
+      # 4️. Security Scan
+      - name: Security Scan
+        run: echo "Running security checks..."
+
+      # 5️. Deploy
+      - name: Deploy
+        run: |
+          echo "Deploying app to demo environment..."
+
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+          # krijo ose kalon në branch
+          git checkout -b demo-deploy || git checkout demo-deploy
+
+          # krijo file për të treguar deploy
+          echo "Deployed successfully!" > deploy.txt
+
+          git add deploy.txt
+          git commit -m "Demo deploy file" || echo "No changes to commit"
+
+          # push me token (zgjidh error-in 403)
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:demo-deploy
+
+      # 6️. Monitor
+      - name: Monitor
+        run: echo "Pipeline finished successfully!"
+
+
+
+
+
+
+        
